@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../store/useGameStore';
 import { Rocket, Gamepad2 } from 'lucide-react';
+import { initAudio } from '../utils/sounds';
 
 export default function LoginScreen({ onJoin }) {
   const navigate = useNavigate();
@@ -34,6 +35,12 @@ export default function LoginScreen({ onJoin }) {
     if (!/^[a-zA-Z0-9_\-\s]+$/.test(trimmed)) {
       setError('Only letters, numbers, spaces, hyphens, and underscores');
       return;
+    }
+
+    try {
+      initAudio();
+    } catch {
+      // Ignore if it fails due to browser policy
     }
 
     useGameStore.getState().setLoginError('');

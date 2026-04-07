@@ -9,9 +9,9 @@ export const createSocketServer = (httpServer) => {
       origin: process.env.CLIENT_URL || 'http://localhost:5173',
       methods: ['GET', 'POST'],
     },
-    pingInterval: 10000,
-    pingTimeout: 5000,
-    transports: ['websocket', 'polling'],
+    pingInterval: 25000,
+    pingTimeout: 60000,
+    transports: ['polling', 'websocket'],
   });
 
   return io;

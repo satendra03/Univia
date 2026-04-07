@@ -22,7 +22,7 @@ class SocketService {
     if (this.socket?.connected) return this.socket;
 
     this.socket = io(SERVER_URL, {
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'],
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,

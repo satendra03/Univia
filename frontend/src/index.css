@@ -266,6 +266,7 @@ body.game-active #root {
   gap: 3px;
 }
 .typing-dots span {
+  display: inline-block;
   width: 5px;
   height: 5px;
   border-radius: 50%;

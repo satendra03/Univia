@@ -25,8 +25,31 @@ export default function connectionHandler(io, socket) {
 
       // Check if username is already taken by another active connection
       if (userService.usernameToSocket.has(sanitizedName)) {
-        socket.emit(EVENTS.ERROR, { message: 'Username is already taken by an active player.' });
-        return;
+        const oldSocketId = userService.usernameToSocket.get(sanitizedName);
+        const oldSocket = io.sockets.sockets.get(oldSocketId);
+        
+        if (oldSocket) {
+          oldSocket.emit(EVENTS.ERROR, { message: 'Logged in from another location.' });
+          oldSocket.disconnect(true);
+        }
+        
+        const oldUser = userService.getUser(oldSocketId);
+        if (oldUser) {
+          const nearbyIds = proximityService.getNearbyUsers(oldSocketId);
+          for (const nearbyId of nearbyIds) {
+            const nearbySocket = io.sockets.sockets.get(nearbyId);
+            if (nearbySocket) {
+              nearbySocket.emit(EVENTS.PROXIMITY_UPDATE, {
+                type: 'exited',
+                userId: oldSocketId,
+                username: oldUser.username,
+              });
+            }
+          }
+          proximityService.removeUser(oldSocketId);
+          userService.removeUser(oldSocketId);
+          io.emit(EVENTS.PLAYER_LEFT, { playerId: oldSocketId, username: oldUser.username });
+        }
       }
 
       const user = userService.addUser(socket.id, sanitizedName);

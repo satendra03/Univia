@@ -130,4 +130,8 @@ export const useGameStore = create((set, get) => ({
   // ─── Connection Status ─────────────────────────────────────
   isConnected: false,
   setConnected: (isConnected) => set({ isConnected }),
+
+  // ─── Audio ─────────────────────────────────────────────────
+  isMuted: false,
+  setMuted: (isMuted) => set({ isMuted }),
 }));

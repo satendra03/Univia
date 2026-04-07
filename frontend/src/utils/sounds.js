@@ -3,11 +3,16 @@
  * No external files needed — generates tones programmatically.
  */
 
+import { useGameStore } from '../store/useGameStore';
+
 let audioCtx = null;
 
-function getAudioContext() {
+export function initAudio() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
   }
   return audioCtx;
 }
@@ -17,8 +22,10 @@ function getAudioContext() {
  * @param {'proximityEnter' | 'proximityExit' | 'message' | 'reaction'} type
  */
 export function playSound(type) {
+  if (useGameStore.getState().isMuted) return;
+
   try {
-    const ctx = getAudioContext();
+    const ctx = initAudio();
     if (ctx.state === 'suspended') ctx.resume();
 
     const osc = ctx.createOscillator();

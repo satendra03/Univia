@@ -7,6 +7,8 @@
  */
 import { useGameStore } from '../store/useGameStore';
 import { useChatStore } from '../store/useChatStore';
+import { Volume2, VolumeX } from 'lucide-react';
+import { initAudio, playSound } from '../utils/sounds';
 
 export default function HUD() {
   const self = useGameStore((s) => s.self);
@@ -16,6 +18,8 @@ export default function HUD() {
   const isChatOpen = useGameStore((s) => s.isChatOpen);
   const unreadCount = useChatStore((s) => s.unreadCount);
   const messages = useChatStore((s) => s.messages);
+  const isMuted = useGameStore((s) => s.isMuted);
+  const setMuted = useGameStore((s) => s.setMuted);
 
   const playerCount = Object.keys(players).length + 1;
   const hasNearby = nearbyUsers.length > 0;
@@ -29,6 +33,22 @@ export default function HUD() {
     store.toggleChat();
     if (!store.isChatOpen) {
       useChatStore.getState().clearUnread();
+    }
+  };
+
+  const handleToggleMute = () => {
+    const newMuted = !isMuted;
+    setMuted(newMuted);
+    
+    // Always attempt to wake up the audio context on user gesture
+    try {
+      initAudio();
+      if (!newMuted) {
+        // Very briefly wait for state to propagate, then play confirmation pip
+        setTimeout(() => playSound('message'), 50);
+      }
+    } catch (err) {
+      console.warn('Audio context init failed:', err);
     }
   };
 
@@ -52,48 +72,75 @@ export default function HUD() {
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.4)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-          <div
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 13,
+                fontWeight: 700,
+                background: self.color,
+                color: '#0a0a1a',
+                flexShrink: 0,
+                boxShadow: `0 0 12px ${self.color}44`,
+              }}
+            >
+              {self.username[0].toUpperCase()}
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <p
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: '#e8e8f0',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {self.username}
+              </p>
+              <p
+                style={{
+                  fontSize: 10,
+                  fontFamily: 'var(--font-mono)',
+                  color: '#6b7280',
+                }}
+              >
+                ({Math.round(self.x)}, {Math.round(self.y)})
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleToggleMute}
             style={{
-              width: 32,
-              height: 32,
-              borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 13,
-              fontWeight: 700,
-              background: self.color,
-              color: '#0a0a1a',
-              flexShrink: 0,
-              boxShadow: `0 0 12px ${self.color}44`,
+              width: 32,
+              height: 32,
+              borderRadius: 8,
+              background: 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              color: isMuted ? '#ef4444' : '#00e5ff',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
             }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)';
+            }}
+            title={isMuted ? "Unmute sounds" : "Mute sounds"}
           >
-            {self.username[0].toUpperCase()}
-          </div>
-          <div style={{ minWidth: 0 }}>
-            <p
-              style={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: '#e8e8f0',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {self.username}
-            </p>
-            <p
-              style={{
-                fontSize: 10,
-                fontFamily: 'var(--font-mono)',
-                color: '#6b7280',
-              }}
-            >
-              ({Math.round(self.x)}, {Math.round(self.y)})
-            </p>
-          </div>
+            {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+          </button>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#9ca3af' }}>
