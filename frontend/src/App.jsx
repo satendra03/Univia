@@ -29,18 +29,23 @@ import AboutPage from './components/AboutPage';
 import DocsPage from './components/DocsPage';
 import PrivacyPage from './components/PrivacyPage';
 import TermsPage from './components/TermsPage';
+import NotFoundPage from './components/NotFoundPage';
 
-function GameWorld() {
+function GameWorld({ serverActive, checkingHealth }) {
   const isLoggedIn = useGameStore((s) => s.isLoggedIn);
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  // Redirect to login if user typed /game directly in the URL
+  // Redirect depending on server state
   useEffect(() => {
-    if (!isLoggedIn) {
-      navigate('/login', { replace: true });
+    if (!checkingHealth) {
+      if (!serverActive) {
+        navigate('/', { replace: true });
+      } else if (!isLoggedIn) {
+        navigate('/login', { replace: true });
+      }
     }
-  }, [isLoggedIn, navigate]);
+  }, [checkingHealth, serverActive, isLoggedIn, navigate]);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -51,7 +56,7 @@ function GameWorld() {
   useMovement();
 
   // Wait for redirect to prevent canvas from crashing when state is empty
-  if (!isLoggedIn) return null;
+  if (checkingHealth || !serverActive || !isLoggedIn) return null;
 
   if (isMobile) {
     return (
@@ -106,12 +111,46 @@ export default function App() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  // Redirect to /game when logged in
+  const [serverActive, setServerActive] = useState(false);
+  const [checkingHealth, setCheckingHealth] = useState(true);
+
+  // Global server health check
+  useEffect(() => {
+    let active = true;
+    const checkServerHealth = async () => {
+      try {
+        const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3000';
+        const res = await fetch(`${SERVER_URL}/health`);
+        if (active) setServerActive(res.ok);
+      } catch (e) {
+        if (active) setServerActive(false);
+      } finally {
+        if (active) setCheckingHealth(false);
+      }
+    };
+    checkServerHealth();
+    const interval = setInterval(checkServerHealth, 10000);
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Redirect to /game when logged in (only if server active)
   useEffect(() => {
     if (isLoggedIn && pathname !== '/game') {
       navigate('/game', { replace: true });
     }
   }, [isLoggedIn, pathname, navigate]);
+
+  // Block protected routes if server is offline
+  useEffect(() => {
+    if (!checkingHealth && !serverActive) {
+      if (pathname === '/login' || pathname === '/game') {
+        navigate('/', { replace: true });
+      }
+    }
+  }, [checkingHealth, serverActive, pathname, navigate]);
 
   // Toggle body scroll lock: only lock on /login and /game
   useEffect(() => {
@@ -134,14 +173,15 @@ export default function App() {
     <>
       <ScrollToTop />
       <Routes>
-        <Route path="/" element={<LandingPage onEnter={() => navigate('/login')} />} />
+        <Route path="/" element={<LandingPage onEnter={() => navigate('/login')} appServerActive={serverActive} appCheckingHealth={checkingHealth} />} />
         <Route path="/login" element={<LoginScreen onJoin={handleJoin} />} />
-        <Route path="/game" element={<GameWorld />} />
+        <Route path="/game" element={<GameWorld serverActive={serverActive} checkingHealth={checkingHealth} />} />
         <Route path="/features" element={<FeaturesPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/docs" element={<DocsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
   );

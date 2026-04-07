@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../store/useGameStore';
+import { Rocket, Gamepad2 } from 'lucide-react';
 
 export default function LoginScreen({ onJoin }) {
   const navigate = useNavigate();
@@ -153,7 +154,7 @@ export default function LoginScreen({ onJoin }) {
               boxShadow: '0 0 30px rgba(0, 229, 255, 0.12)',
             }}
           >
-            <span style={{ fontSize: 36 }}>🌌</span>
+            <Rocket size={34} color="#00e5ff" />
           </div>
           <h1
             style={{
@@ -304,7 +305,7 @@ export default function LoginScreen({ onJoin }) {
                 color: 'var(--text-muted)',
               }}
             >
-              <span style={{ fontSize: 18 }}>🕹️</span>
+              <Gamepad2 size={16} />
               <span>Virtual joystick to move</span>
             </div>
           ) : (

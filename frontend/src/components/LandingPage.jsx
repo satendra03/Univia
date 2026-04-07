@@ -92,11 +92,36 @@ const STATS = [
 export default function LandingPage({ onEnter }) {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
+  const [serverActive, setServerActive] = useState(false);
+  const [checkingHealth, setCheckingHealth] = useState(true);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    const checkServerHealth = async () => {
+      try {
+        const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3000';
+        const res = await fetch(`${SERVER_URL}/health`);
+        if (active) {
+          setServerActive(res.ok);
+        }
+      } catch (e) {
+        if (active) setServerActive(false);
+      } finally {
+        if (active) setCheckingHealth(false);
+      }
+    };
+    checkServerHealth();
+    const interval = setInterval(checkServerHealth, 10000);
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -160,8 +185,10 @@ export default function LandingPage({ onEnter }) {
           background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(8px)',
           marginBottom: 32, position: 'relative', zIndex: 1,
         }}>
-          <GlowDot />
-          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.15em', color: '#d1d5db' }}>UNIVIA IS LIVE</span>
+          <GlowDot color={serverActive ? '#4ade80' : '#ef4444'} />
+          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.15em', color: '#d1d5db' }}>
+            {checkingHealth ? 'CHECKING SYSTEMS...' : serverActive ? 'UNIVIA IS LIVE' : 'SYSTEMS OFFLINE'}
+          </span>
         </div>
 
         <h1 style={{
@@ -181,17 +208,32 @@ export default function LandingPage({ onEnter }) {
 
         <div style={{ display: 'flex', gap: 14, position: 'relative', zIndex: 1, flexWrap: 'wrap', justifyContent: 'center' }}>
           <button
-            onClick={onEnter}
+            onClick={() => serverActive && onEnter()}
+            disabled={!serverActive || checkingHealth}
             style={{
-              padding: '14px 36px', borderRadius: 10, border: 'none', cursor: 'pointer',
-              background: CYAN, color: '#000', fontWeight: 700, fontSize: 15,
-              boxShadow: '0 0 30px rgba(0,229,255,0.25), 0 4px 15px rgba(0,0,0,0.3)',
-              transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+              padding: '14px 36px', borderRadius: 10, border: 'none', 
+              cursor: serverActive ? 'pointer' : 'not-allowed',
+              background: serverActive ? CYAN : '#4b5563', 
+              color: serverActive ? '#000' : '#9ca3af', 
+              fontWeight: 700, fontSize: 15,
+              boxShadow: serverActive ? '0 0 30px rgba(0,229,255,0.25), 0 4px 15px rgba(0,0,0,0.3)' : 'none',
+              transition: 'transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease',
+              opacity: checkingHealth ? 0.7 : 1,
             }}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.06)'; e.currentTarget.style.boxShadow = '0 0 40px rgba(0,229,255,0.4), 0 4px 15px rgba(0,0,0,0.3)'; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 0 30px rgba(0,229,255,0.25), 0 4px 15px rgba(0,0,0,0.3)'; }}
+            onMouseEnter={e => { 
+              if (serverActive) {
+                e.currentTarget.style.transform = 'scale(1.06)'; 
+                e.currentTarget.style.boxShadow = '0 0 40px rgba(0,229,255,0.4), 0 4px 15px rgba(0,0,0,0.3)'; 
+              }
+            }}
+            onMouseLeave={e => { 
+              if (serverActive) {
+                e.currentTarget.style.transform = 'scale(1)'; 
+                e.currentTarget.style.boxShadow = '0 0 30px rgba(0,229,255,0.25), 0 4px 15px rgba(0,0,0,0.3)'; 
+              }
+            }}
           >
-            Enter Univia
+            {checkingHealth ? 'Connecting...' : serverActive ? 'Enter Univia' : 'Server Offline'}
           </button>
           <button style={{
             padding: '14px 36px', borderRadius: 10, cursor: 'pointer',
@@ -313,16 +355,31 @@ export default function LandingPage({ onEnter }) {
             The gates to Univia are open. Jump in, explore the universe, and make real connections.
           </p>
           <button
-            onClick={onEnter}
+            onClick={() => serverActive && onEnter()}
+            disabled={!serverActive || checkingHealth}
             style={{
-              padding: '14px 40px', borderRadius: 10, border: 'none', cursor: 'pointer',
-              background: '#fff', color: '#000', fontWeight: 700, fontSize: 15,
+              padding: '14px 40px', borderRadius: 10, border: 'none', 
+              cursor: serverActive ? 'pointer' : 'not-allowed',
+              background: serverActive ? '#fff' : '#4b5563', 
+              color: serverActive ? '#000' : '#9ca3af', 
+              fontWeight: 700, fontSize: 15,
+              opacity: checkingHealth ? 0.7 : 1,
               transition: 'transform 0.15s ease, background 0.15s ease',
             }}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.06)'; e.currentTarget.style.background = '#e5e7eb'; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = '#fff'; }}
+            onMouseEnter={e => { 
+              if (serverActive) {
+                e.currentTarget.style.transform = 'scale(1.06)'; 
+                e.currentTarget.style.background = '#e5e7eb'; 
+              }
+            }}
+            onMouseLeave={e => { 
+              if (serverActive) {
+                e.currentTarget.style.transform = 'scale(1)'; 
+                e.currentTarget.style.background = '#fff'; 
+              }
+            }}
           >
-            Claim Your Key
+            {checkingHealth ? 'Connecting...' : serverActive ? 'Claim Your Key' : 'Server Offline'}
           </button>
         </div>
       </section>
