@@ -34,7 +34,7 @@ import NotFoundPage from './components/NotFoundPage';
 function GameWorld({ serverActive, checkingHealth }) {
   const isLoggedIn = useGameStore((s) => s.isLoggedIn);
   const navigate = useNavigate();
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 480);
 
   // Redirect depending on server state
   useEffect(() => {
@@ -48,7 +48,7 @@ function GameWorld({ serverActive, checkingHealth }) {
   }, [checkingHealth, serverActive, isLoggedIn, navigate]);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    const handleResize = () => setIsMobile(window.innerWidth < 480);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);

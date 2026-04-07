@@ -41,41 +41,6 @@ A real-time 2D multiplayer proximity social platform where users connect through
 
 ---
 
-## Proximity Algorithm
-
-### Spatial Grid Partitioning
-
-Instead of O(n²) brute-force distance checks, we use **grid-based spatial partitioning**:
-
-1. **Grid Cell Size = Proximity Radius** (150px)
-2. Each user is mapped to a grid cell based on position
-3. On movement, only check the **3×3 neighborhood** (9 cells)
-4. Reduces complexity to **O(n × k)** where k = avg users per neighborhood
-
-```
-┌─────┬─────┬─────┬─────┐
-│     │     │ ✦   │     │   ✦ = User
-│     │     │     │     │
-├─────┼─────┼─────┼─────┤   Only check the 9 cells
-│     │ ░░░ │ ░░░ │ ░░░ │   around the user (shaded)
-│     │ ░✦░ │ ░░░ │ ░░░ │
-├─────┼─────┼─────┼─────┤
-│     │ ░░░ │ ░✧░ │ ░░░ │   ✧ = Nearby user (checked)
-│     │ ░░░ │ ░░░ │ ░░░ │
-├─────┼─────┼─────┼─────┤
-│     │     │     │     │
-└─────┴─────┴─────┴─────┘
-```
-
-### Diff-Based Enter/Exit Detection
-
-- Track each user's **previous nearby set**
-- On movement, compute **current nearby set**
-- **Diff** to find: `entered = current - previous`, `exited = previous - current`
-- Only emit proximity events for actual **state transitions**
-
----
-
 ## Real-Time Design
 
 ### Socket Event Flow

@@ -24,3 +24,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# files
+Final.mp4
+presentation_script.md
+Raw.mp4
+thumbnail.png
