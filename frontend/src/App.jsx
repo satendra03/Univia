@@ -11,8 +11,9 @@
  *   /privacy   → PrivacyPage
  *   /terms     → TermsPage
  */
-import { useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { MonitorX } from 'lucide-react';
 import { useGameStore } from './store/useGameStore';
 import useSocket from './hooks/useSocket';
 import useMovement from './hooks/useMovement';
@@ -30,7 +31,53 @@ import PrivacyPage from './components/PrivacyPage';
 import TermsPage from './components/TermsPage';
 
 function GameWorld() {
+  const isLoggedIn = useGameStore((s) => s.isLoggedIn);
+  const navigate = useNavigate();
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Redirect to login if user typed /game directly in the URL
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/login', { replace: true });
+    }
+  }, [isLoggedIn, navigate]);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   useMovement();
+
+  // Wait for redirect to prevent canvas from crashing when state is empty
+  if (!isLoggedIn) return null;
+
+  if (isMobile) {
+    return (
+      <div style={{
+        position: 'fixed', inset: 0, zIndex: 9999, background: '#0a0a0e', color: '#fff',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        padding: 32, textAlign: 'center', fontFamily: "'Inter', sans-serif"
+      }}>
+        <MonitorX size={48} color="#00e5ff" style={{ marginBottom: 24, opacity: 0.8 }} />
+        <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 12, letterSpacing: '-0.02em' }}>Desktop Only</h2>
+        <p style={{ fontSize: 15, color: '#9ca3af', lineHeight: 1.6, maxWidth: 320, marginBottom: 32 }}>
+          Univia requires a larger screen and keyboard controls to navigate the cosmic canvas.
+        </p>
+        <button
+          onClick={() => window.location.href = '/'}
+          style={{
+            padding: '12px 24px', borderRadius: 8, background: 'rgba(0,229,255,0.1)',
+            border: '1px solid rgba(0,229,255,0.2)', color: '#00e5ff',
+            fontWeight: 600, fontSize: 14, cursor: 'pointer'
+          }}
+        >
+          Return Home
+        </button>
+      </div>
+    );
+  }
 
   return (
     <>
