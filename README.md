@@ -118,13 +118,22 @@ npm install
 
 ### 2. Configure Environment
 
+Requires two separate `.env` files — one for the backend, and one for the frontend.
+
+**Backend Configuration:**
+Create `backend/.env`:
 ```bash
-# backend/.env
-PORT=3001
-CLIENT_URL=http://localhost:5173
+PORT=
+CLIENT_URL=
 PROXIMITY_RADIUS=150
 WORLD_WIDTH=3000
 WORLD_HEIGHT=2000
+```
+
+**Frontend Configuration:**
+Create `frontend/.env`:
+```bash
+VITE_SERVER_URL=
 ```
 
 ### 3. Start Development

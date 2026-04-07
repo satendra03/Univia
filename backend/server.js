@@ -7,7 +7,7 @@ import app from './src/app.js';
 import { createSocketServer } from './src/config/socket.js';
 import { registerSocketHandlers } from './src/sockets/index.js';
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 const server = http.createServer(app);
 const io = createSocketServer(server);
