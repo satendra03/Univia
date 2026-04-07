@@ -4,9 +4,11 @@
  * Mobile-responsive: adapts layout, hides keyboard hints on touch devices.
  */
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../store/useGameStore';
 
 export default function LoginScreen({ onJoin }) {
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
   const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -39,16 +41,27 @@ export default function LoginScreen({ onJoin }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4"
-         style={{ background: 'linear-gradient(135deg, #0a0a1a 0%, #1a1040 40%, #0d1117 100%)' }}>
-
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 50,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px',
+        background: '#0a0a0e',
+        color: '#f3f4f6',
+      }}
+    >
       {/* Animated background particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
         {Array.from({ length: 50 }).map((_, i) => (
           <div
             key={i}
-            className="absolute rounded-full"
             style={{
+              position: 'absolute',
+              borderRadius: '50%',
               width: Math.random() * 3 + 1 + 'px',
               height: Math.random() * 3 + 1 + 'px',
               background: 'white',
@@ -63,35 +76,122 @@ export default function LoginScreen({ onJoin }) {
       </div>
 
       {/* Login Card */}
-      <div className="glass-panel w-full max-w-md animate-fade-in relative"
-           style={{
-             padding: 'clamp(24px, 5vw, 40px)',
-             boxShadow: '0 0 80px rgba(129, 140, 248, 0.1), 0 8px 32px rgba(0,0,0,0.4)',
-           }}>
+      <div
+        className="glass-panel animate-fade-in"
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          width: '100%',
+          maxWidth: '440px',
+          padding: 'clamp(28px, 5vw, 48px)',
+          background: 'rgba(17, 17, 22, 0.85)',
+          border: '1px solid rgba(255, 255, 255, 0.06)',
+          boxShadow:
+            '0 0 80px rgba(0, 229, 255, 0.06), 0 8px 40px rgba(0, 0, 0, 0.5)',
+          borderRadius: '20px',
+        }}
+      >
+        {/* Back button */}
+        {(
+          <button
+            onClick={() => navigate('/')}
+            style={{
+              position: 'absolute',
+              top: 18,
+              left: 18,
+              background: 'none',
+              border: 'none',
+              color: '#6b7280',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: 13,
+              fontWeight: 500,
+              transition: 'color 0.2s',
+              padding: '4px 8px',
+              borderRadius: '6px',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#fff';
+              e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = '#6b7280';
+              e.currentTarget.style.background = 'none';
+            }}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
+        )}
 
         {/* Logo / Title */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-4"
-               style={{
-                 background: 'linear-gradient(135deg, rgba(129,140,248,0.2), rgba(167,139,250,0.2))',
-                 border: '2px solid rgba(129,140,248,0.3)',
-               }}>
-            <span className="text-3xl sm:text-4xl">🌌</span>
+        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 72,
+              height: 72,
+              borderRadius: '50%',
+              marginBottom: 16,
+              background: 'rgba(0, 229, 255, 0.06)',
+              border: '2px solid rgba(0, 229, 255, 0.25)',
+              boxShadow: '0 0 30px rgba(0, 229, 255, 0.12)',
+            }}
+          >
+            <span style={{ fontSize: 36 }}>🌌</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2"
-              style={{ background: 'linear-gradient(135deg, #818cf8, #a78bfa, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            Virtual Cosmos
+          <h1
+            style={{
+              fontSize: 'clamp(24px, 4vw, 32px)',
+              fontWeight: 700,
+              marginBottom: 8,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.2,
+            }}
+          >
+            Uni<span style={{ color: '#00e5ff' }}>via</span>
           </h1>
-          <p className="text-xs sm:text-sm" style={{ color: 'var(--text-secondary)' }}>
+          <p
+            style={{
+              fontSize: 14,
+              color: 'var(--text-secondary)',
+              margin: 0,
+            }}
+          >
             Enter the universe. Meet nearby travelers.
           </p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="username-input" className="block text-sm font-medium mb-2"
-                   style={{ color: 'var(--text-secondary)' }}>
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: '20px' }}>
+            <label
+              htmlFor="username-input"
+              style={{
+                display: 'block',
+                fontSize: 13,
+                fontWeight: 600,
+                color: 'var(--text-secondary)',
+                marginBottom: 10,
+                letterSpacing: '0.02em',
+                textTransform: 'uppercase',
+              }}
+            >
               Choose your name
             </label>
             <input
@@ -102,50 +202,170 @@ export default function LoginScreen({ onJoin }) {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               autoComplete="off"
+              autoFocus
               maxLength={20}
-              style={{ fontSize: '16px' }} /* 16px prevents iOS zoom on focus */
+              style={{
+                fontSize: '16px',
+                padding: '14px 18px',
+                borderRadius: '12px',
+              }}
             />
             {error && (
-              <p className="mt-2 text-xs" style={{ color: 'var(--accent-rose)' }}>{error}</p>
+              <p
+                style={{
+                  marginTop: 8,
+                  fontSize: 12,
+                  color: 'var(--accent-rose)',
+                }}
+              >
+                {error}
+              </p>
             )}
             {loginError && !error && (
-              <p className="mt-2 text-xs" style={{ color: 'var(--accent-rose)' }}>{loginError}</p>
+              <p
+                style={{
+                  marginTop: 8,
+                  fontSize: 12,
+                  color: 'var(--accent-rose)',
+                }}
+              >
+                {loginError}
+              </p>
             )}
           </div>
 
-          <button type="submit" className="btn-primary w-full text-base">
-            <span>🚀</span>
-            Enter the Cosmos
+          <button
+            type="submit"
+            style={{
+              width: '100%',
+              padding: '14px 24px',
+              fontSize: 16,
+              fontWeight: 700,
+              fontFamily: 'var(--font-sans)',
+              color: '#0a0a1a',
+              background: 'linear-gradient(135deg, #00e5ff 0%, #00b8d4 100%)',
+              border: 'none',
+              borderRadius: '12px',
+              cursor: 'pointer',
+              transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: '0 4px 24px rgba(0, 229, 255, 0.3)',
+              letterSpacing: '0.02em',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow =
+                '0 8px 32px rgba(0, 229, 255, 0.45)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow =
+                '0 4px 24px rgba(0, 229, 255, 0.3)';
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.transform = 'translateY(0) scale(0.98)';
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+          >
+            Enter Univia
           </button>
         </form>
 
         {/* Controls hint — different for touch vs desktop */}
-        <div className="mt-6 pt-4" style={{ borderTop: '1px solid var(--glass-border)' }}>
-          <p className="text-xs text-center mb-3" style={{ color: 'var(--text-muted)' }}>Controls</p>
+        <div
+          style={{
+            marginTop: 28,
+            paddingTop: 20,
+            borderTop: '1px solid rgba(129, 140, 248, 0.08)',
+          }}
+        >
+          <p
+            style={{
+              fontSize: 11,
+              textAlign: 'center',
+              marginBottom: 12,
+              color: 'var(--text-muted)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              fontWeight: 600,
+            }}
+          >
+            Controls
+          </p>
           {isTouchDevice ? (
-            <div className="flex justify-center items-center gap-3 text-xs" style={{ color: 'var(--text-muted)' }}>
-              <div className="flex items-center gap-1.5">
-                <span className="text-lg">🕹️</span>
-                <span>Virtual joystick to move</span>
-              </div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: 8,
+                fontSize: 12,
+                color: 'var(--text-muted)',
+              }}
+            >
+              <span style={{ fontSize: 18 }}>🕹️</span>
+              <span>Virtual joystick to move</span>
             </div>
           ) : (
-            <div className="flex justify-center gap-6">
-              <div className="flex items-center gap-2">
-                <div className="flex gap-1">
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: 24,
+                alignItems: 'center',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ display: 'flex', gap: 4 }}>
                   {['W', 'A', 'S', 'D'].map((key) => (
-                    <kbd key={key} className="inline-flex items-center justify-center w-7 h-7 rounded text-xs font-mono font-bold"
-                         style={{ background: 'rgba(129,140,248,0.1)', border: '1px solid rgba(129,140,248,0.2)', color: 'var(--accent-indigo)' }}>
+                    <kbd
+                      key={key}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: 28,
+                        height: 28,
+                        borderRadius: 6,
+                        fontSize: 11,
+                        fontFamily: 'var(--font-mono)',
+                        fontWeight: 700,
+                        background: 'rgba(0, 229, 255, 0.06)',
+                        border: '1px solid rgba(0, 229, 255, 0.15)',
+                        color: '#00e5ff',
+                      }}
+                    >
                       {key}
                     </kbd>
                   ))}
                 </div>
               </div>
-              <span className="text-xs self-center" style={{ color: 'var(--text-muted)' }}>or</span>
-              <div className="flex items-center gap-1">
+              <span
+                style={{
+                  fontSize: 12,
+                  color: 'var(--text-muted)',
+                }}
+              >
+                or
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 {['↑', '↓', '←', '→'].map((key) => (
-                  <kbd key={key} className="inline-flex items-center justify-center w-7 h-7 rounded text-xs"
-                       style={{ background: 'rgba(129,140,248,0.1)', border: '1px solid rgba(129,140,248,0.2)', color: 'var(--accent-indigo)' }}>
+                  <kbd
+                    key={key}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: 28,
+                      height: 28,
+                      borderRadius: 6,
+                      fontSize: 12,
+                      background: 'rgba(0, 229, 255, 0.06)',
+                      border: '1px solid rgba(0, 229, 255, 0.15)',
+                      color: '#00e5ff',
+                    }}
+                  >
                     {key}
                   </kbd>
                 ))}

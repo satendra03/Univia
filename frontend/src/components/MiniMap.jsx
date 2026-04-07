@@ -1,7 +1,7 @@
 /**
  * MiniMap — Shows a bird's-eye view of the world with all player positions.
+ * Premium cosmic theme with cyan accents.
  * Mobile-responsive: smaller size, hides when chat is open on mobile.
- * Positioned at bottom-left on mobile (above joystick), bottom-right on desktop.
  */
 import { useRef, useEffect, useState } from 'react';
 import { useGameStore } from '../store/useGameStore';
@@ -34,10 +34,12 @@ export default function MiniMap() {
     const draw = () => {
       ctx.clearRect(0, 0, mapWidth, mapHeight);
 
-      ctx.fillStyle = 'rgba(10, 10, 26, 0.8)';
+      // Background
+      ctx.fillStyle = 'rgba(10, 10, 20, 0.9)';
       ctx.fillRect(0, 0, mapWidth, mapHeight);
 
-      ctx.strokeStyle = 'rgba(129, 140, 248, 0.08)';
+      // Grid lines
+      ctx.strokeStyle = 'rgba(0, 229, 255, 0.05)';
       ctx.lineWidth = 0.5;
       const gridSize = 100;
       const scaleX = mapWidth / world.width;
@@ -56,6 +58,12 @@ export default function MiniMap() {
         ctx.stroke();
       }
 
+      // Border
+      ctx.strokeStyle = 'rgba(0, 229, 255, 0.12)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(0, 0, mapWidth, mapHeight);
+
+      // Other players
       const playerState = useGameStore.getState().players;
       Object.values(playerState).forEach((p) => {
         const px = p.x * scaleX;
@@ -66,25 +74,32 @@ export default function MiniMap() {
         ctx.fill();
       });
 
+      // Self player
       const selfState = useGameStore.getState().self;
       if (selfState) {
         const sx = selfState.x * scaleX;
         const sy = selfState.y * scaleY;
 
+        // Proximity radius
         const proxRadius = 150 * scaleX;
         ctx.beginPath();
         ctx.arc(sx, sy, proxRadius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(129, 140, 248, 0.06)';
+        ctx.fillStyle = 'rgba(0, 229, 255, 0.04)';
         ctx.fill();
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.1)';
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
 
+        // Player dot
         ctx.beginPath();
         ctx.arc(sx, sy, isMobile ? 2 : 3, 0, Math.PI * 2);
-        ctx.fillStyle = '#818cf8';
+        ctx.fillStyle = '#00e5ff';
         ctx.fill();
 
+        // Glow ring
         ctx.beginPath();
         ctx.arc(sx, sy, isMobile ? 3 : 5, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(129, 140, 248, 0.4)';
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.4)';
         ctx.lineWidth = 1;
         ctx.stroke();
       }
@@ -102,27 +117,64 @@ export default function MiniMap() {
   if (isMobile && isChatOpen) return null;
 
   return (
-    <div className="fixed z-20 glass-panel-sm overflow-hidden animate-fade-in"
-         style={{
-           width: mapWidth + 2,
-           height: mapHeight + 2,
-           // Mobile: top-left below HUD. Desktop: bottom-right
-           ...(isMobile
-             ? { top: 44, left: 8 }
-             : { bottom: isChatOpen ? '460px' : '16px', right: '16px' }
-           ),
-           transition: isMobile ? 'none' : 'bottom 0.3s ease',
-         }}>
+    <div
+      className="animate-fade-in"
+      style={{
+        position: 'fixed',
+        zIndex: 20,
+        width: mapWidth + 2,
+        height: mapHeight + 22,
+        overflow: 'hidden',
+        background: 'rgba(10, 10, 20, 0.85)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        border: '1px solid rgba(0, 229, 255, 0.08)',
+        borderRadius: 12,
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
+        ...(isMobile
+          ? { top: 44, left: 8 }
+          : { bottom: 54, left: 16 }
+        ),
+      }}
+    >
+      {/* Label */}
+      <div
+        style={{
+          padding: '4px 8px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          borderBottom: '1px solid rgba(0, 229, 255, 0.06)',
+        }}
+      >
+        <span
+          style={{
+            fontSize: 9,
+            fontFamily: 'var(--font-mono)',
+            fontWeight: 600,
+            color: '#00e5ff',
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+          }}
+        >
+          Map
+        </span>
+        <span
+          style={{
+            fontSize: 8,
+            fontFamily: 'var(--font-mono)',
+            color: '#4b5563',
+          }}
+        >
+          {world.width}×{world.height}
+        </span>
+      </div>
       <canvas
         ref={canvasRef}
         width={mapWidth}
         height={mapHeight}
         style={{ display: 'block' }}
       />
-      <div className="absolute top-0.5 left-1.5 text-[8px] font-mono"
-           style={{ color: 'var(--text-muted)', opacity: 0.7 }}>
-        MAP
-      </div>
     </div>
   );
 }

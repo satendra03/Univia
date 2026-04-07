@@ -1,5 +1,6 @@
 /**
  * UserList — Shows nearby users with clickable profiles.
+ * Premium cosmic theme with cyan accents.
  * On mobile: hidden by default, shown via toggle in the HUD stats area.
  * On desktop: always visible in sidebar.
  */
@@ -33,66 +34,178 @@ export default function UserList() {
     return (
       <button
         onClick={() => setShowOnMobile(true)}
-        className="fixed z-20 glass-panel-sm px-3 py-1.5 flex items-center gap-1.5 cursor-pointer animate-fade-in"
-        style={{ top: 48, right: 8, border: 'none', background: 'var(--glass-bg)' }}>
-        <span className="status-dot nearby" />
-        <span className="text-[10px] font-semibold" style={{ color: 'var(--text-muted)' }}>
+        className="animate-fade-in"
+        style={{
+          position: 'fixed',
+          top: 48,
+          right: 8,
+          zIndex: 20,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: '5px 12px',
+          cursor: 'pointer',
+          background: 'rgba(10, 10, 20, 0.8)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(0, 229, 255, 0.08)',
+          borderRadius: 20,
+        }}
+      >
+        <span
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: '50%',
+            display: 'inline-block',
+            background: '#00e5ff',
+            boxShadow: '0 0 8px rgba(0, 229, 255, 0.5)',
+          }}
+        />
+        <span style={{ fontSize: 10, fontWeight: 600, color: '#9ca3af' }}>
           {nearbyUsers.length} nearby
         </span>
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2.5"><polyline points="6 9 12 15 18 9" /></svg>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2.5">
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
       </button>
     );
   }
 
   return (
     <>
-      <div className="fixed z-20 glass-panel p-3 sm:p-4 animate-slide-in-right"
-           style={{
-             top: isMobile ? 48 : 80,
-             right: 8,
-             width: isMobile ? 'min(200px, calc(100vw - 16px))' : 220,
-           }}>
-        <div className="flex items-center justify-between gap-2 mb-2 sm:mb-3">
-          <div className="flex items-center gap-2">
-            <span className="status-dot nearby" />
-            <h3 className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider"
-                style={{ color: 'var(--text-muted)' }}>
+      <div
+        className="animate-slide-in-right"
+        style={{
+          position: 'fixed',
+          top: isMobile ? 48 : 104,
+          right: 8,
+          zIndex: 20,
+          width: isMobile ? 'min(200px, calc(100vw - 16px))' : 220,
+          background: 'rgba(10, 10, 20, 0.85)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(0, 229, 255, 0.08)',
+          borderRadius: 16,
+          padding: '12px 14px',
+          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.4)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: '50%',
+                display: 'inline-block',
+                background: '#00e5ff',
+                boxShadow: '0 0 8px rgba(0, 229, 255, 0.5)',
+              }}
+            />
+            <h3
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                color: '#6b7280',
+                margin: 0,
+              }}
+            >
               Nearby ({nearbyUsers.length})
             </h3>
           </div>
           {isMobile && (
             <button
               onClick={() => { setShowOnMobile(false); setProfileOpen(null); }}
-              className="w-5 h-5 rounded flex items-center justify-center text-[10px] cursor-pointer"
-              style={{ color: 'var(--text-muted)', background: 'rgba(129,140,248,0.05)' }}>
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: 6,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 10,
+                cursor: 'pointer',
+                color: '#6b7280',
+                background: 'rgba(255, 255, 255, 0.04)',
+                border: 'none',
+              }}
+            >
               ✕
             </button>
           )}
         </div>
 
-        <div className="space-y-1.5 sm:space-y-2">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           {entries.map(([userId, { username, color }]) => {
             const isInRange = nearbyUsers.some((u) => u.id === userId);
             const player = players[userId];
             return (
-              <div key={userId}
-                   onClick={() => setProfileOpen(profileOpen === userId ? null : userId)}
-                   className="flex items-center gap-2 sm:gap-3 p-1.5 sm:p-2 rounded-lg transition-colors cursor-pointer"
-                   style={{
-                     background: profileOpen === userId ? 'rgba(129,140,248,0.12)' : 'rgba(129,140,248,0.05)',
-                     opacity: isInRange ? 1 : 0.4,
-                   }}
-                   onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(129,140,248,0.1)'}
-                   onMouseLeave={(e) => e.currentTarget.style.background = profileOpen === userId ? 'rgba(129,140,248,0.12)' : 'rgba(129,140,248,0.05)'}>
-                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold shrink-0"
-                     style={{ background: color, color: '#0a0a1a' }}>
+              <div
+                key={userId}
+                onClick={() => setProfileOpen(profileOpen === userId ? null : userId)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  padding: '8px 10px',
+                  borderRadius: 12,
+                  transition: 'all 0.15s ease',
+                  cursor: 'pointer',
+                  background: profileOpen === userId ? 'rgba(0, 229, 255, 0.08)' : 'rgba(255, 255, 255, 0.02)',
+                  border: profileOpen === userId ? '1px solid rgba(0, 229, 255, 0.1)' : '1px solid transparent',
+                  opacity: isInRange ? 1 : 0.4,
+                }}
+                onMouseEnter={(e) => {
+                  if (profileOpen !== userId) e.currentTarget.style.background = 'rgba(0, 229, 255, 0.05)';
+                }}
+                onMouseLeave={(e) => {
+                  if (profileOpen !== userId) e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
+                }}
+              >
+                <div
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    flexShrink: 0,
+                    background: color,
+                    color: '#0a0a1a',
+                    boxShadow: `0 0 8px ${color}44`,
+                  }}
+                >
                   {username?.[0]?.toUpperCase() || '?'}
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <p
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 500,
+                      color: '#e8e8f0',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      margin: 0,
+                    }}
+                  >
                     {username}
                   </p>
-                  <p className="text-[10px] sm:text-xs truncate" style={{ color: isInRange ? 'var(--accent-cyan)' : 'var(--text-muted)' }}>
+                  <p
+                    style={{
+                      fontSize: 10,
+                      color: isInRange ? '#00e5ff' : '#6b7280',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      margin: 0,
+                    }}
+                  >
                     {player?.status || (isInRange ? 'In range' : 'Moved away')}
                   </p>
                 </div>
@@ -101,45 +214,6 @@ export default function UserList() {
           })}
         </div>
       </div>
-
-      {/* ── Profile Popup ── */}
-      {profileOpen && selectedDetail && (
-        <div className="fixed z-25 glass-panel p-4 sm:p-5 animate-fade-in"
-             style={{
-               top: isMobile ? 48 : 80,
-               right: isMobile ? 8 : 240,
-               width: isMobile ? 'min(200px, calc(100vw - 16px))' : 220,
-             }}>
-          <div className="flex flex-col items-center text-center gap-2 sm:gap-3">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-lg sm:text-xl font-bold"
-                 style={{ background: selectedDetail.color, color: '#0a0a1a' }}>
-              {selectedDetail.username?.[0]?.toUpperCase()}
-            </div>
-            <div>
-              <p className="text-xs sm:text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                {selectedDetail.username}
-              </p>
-              {selectedPlayer?.status && (
-                <p className="text-[10px] sm:text-xs mt-1 px-2 py-0.5 rounded-full inline-block"
-                   style={{ background: 'rgba(34,211,238,0.1)', color: 'var(--accent-cyan)' }}>
-                  {selectedPlayer.status}
-                </p>
-              )}
-            </div>
-            {selectedPlayer?.bio && (
-              <p className="text-[10px] sm:text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                {selectedPlayer.bio}
-              </p>
-            )}
-            <button
-              onClick={() => setProfileOpen(null)}
-              className="text-[10px] sm:text-xs cursor-pointer mt-1"
-              style={{ color: 'var(--text-muted)' }}>
-              Close
-            </button>
-          </div>
-        </div>
-      )}
     </>
   );
 }

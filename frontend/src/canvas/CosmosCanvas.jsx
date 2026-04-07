@@ -28,74 +28,6 @@ export default function CosmosCanvas() {
   const floatingEmojisRef = useRef([]); // { text, container, startTime, userId }
   const seenReactionsRef = useRef(new Set()); // Tracks all spawned reaction IDs to prevent duplicates
 
-  // ─── Initialize PixiJS ──────────────────────────────────────
-  useEffect(() => {
-    let destroyed = false;
-
-    const init = async () => {
-      if (!canvasRef.current || destroyed) return;
-
-      const app = new Application();
-      await app.init({
-        background: 0x0a0a1a,
-        resizeTo: window,
-        antialias: true,
-        resolution: window.devicePixelRatio || 1,
-        autoDensity: true,
-      });
-
-      if (destroyed) {
-        app.destroy(true);
-        return;
-      }
-
-      canvasRef.current.appendChild(app.canvas);
-      appRef.current = app;
-
-      // World container
-      const worldContainer = new Container();
-      app.stage.addChild(worldContainer);
-      worldContainerRef.current = worldContainer;
-
-      // Layers
-      createStarField(worldContainer);
-      createGrid(worldContainer);
-
-      // Connection lines layer
-      const linesGfx = new Graphics();
-      worldContainer.addChild(linesGfx);
-      connectionLinesRef.current = linesGfx;
-
-      // Proximity circle
-      const proximityGfx = new Graphics();
-      worldContainer.addChild(proximityGfx);
-      proximityCircleRef.current = proximityGfx;
-
-      // Start render loop
-      app.ticker.add(() => {
-        updateRender();
-      });
-    };
-
-    init();
-
-    const handleResize = () => {
-      if (appRef.current) {
-        appRef.current.renderer.resize(window.innerWidth, window.innerHeight);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      destroyed = true;
-      window.removeEventListener('resize', handleResize);
-      if (appRef.current) {
-        appRef.current.destroy(true, { children: true });
-        appRef.current = null;
-      }
-    };
-  }, []);
-
   // ─── Create Star Field ──────────────────────────────────────
   const createStarField = useCallback((container) => {
     const { width: worldW, height: worldH } = useGameStore.getState().world;
@@ -130,10 +62,10 @@ export default function CosmosCanvas() {
       gridGfx.moveTo(0, y);
       gridGfx.lineTo(worldW, y);
     }
-    gridGfx.stroke({ color: 0x1a1a3e, width: 1, alpha: 0.4 });
+    gridGfx.stroke({ color: 0x0d1a2a, width: 1, alpha: 0.5 });
 
     gridGfx.rect(0, 0, worldW, worldH);
-    gridGfx.stroke({ color: 0x818cf8, width: 2, alpha: 0.3 });
+    gridGfx.stroke({ color: 0x00e5ff, width: 2, alpha: 0.15 });
 
     container.addChild(gridGfx);
   }, []);
@@ -211,33 +143,6 @@ export default function CosmosCanvas() {
     }
   }, []);
 
-  // ─── Spawn Floating Emoji ──────────────────────────────────
-  const spawnFloatingEmoji = useCallback((userId, emoji) => {
-    if (!worldContainerRef.current) return;
-
-    const avatar = avatarsRef.current[userId];
-    if (!avatar) return;
-
-    const style = new TextStyle({
-      fontSize: 28,
-      align: 'center',
-    });
-
-    const text = new Text({ text: emoji, style });
-    text.anchor.set(0.5);
-    text.x = avatar.container.x + (Math.random() - 0.5) * 20;
-    text.y = avatar.container.y - AVATAR_RADIUS - 20;
-
-    worldContainerRef.current.addChild(text);
-
-    floatingEmojisRef.current.push({
-      text,
-      startTime: Date.now(),
-      startX: text.x,
-      startY: text.y,
-    });
-  }, []);
-
   // ─── Main Render Loop ──────────────────────────────────────
   const updateRender = useCallback(() => {
     const state = useGameStore.getState();
@@ -259,8 +164,8 @@ export default function CosmosCanvas() {
       const pg = proximityCircleRef.current;
       pg.clear();
       pg.circle(self.x, self.y, PROXIMITY_RADIUS);
-      pg.stroke({ color: 0x818cf8, width: 1.5, alpha: 0.2 });
-      pg.fill({ color: 0x818cf8, alpha: 0.03 });
+      pg.stroke({ color: 0x00e5ff, width: 1.5, alpha: 0.15 });
+      pg.fill({ color: 0x00e5ff, alpha: 0.02 });
     }
 
     // ── Update Other Avatars ──
@@ -291,12 +196,12 @@ export default function CosmosCanvas() {
         if (otherAvatar) {
           linesGfx.moveTo(self.x, self.y);
           linesGfx.lineTo(otherAvatar.container.x, otherAvatar.container.y);
-          linesGfx.stroke({ color: 0x818cf8, width: 1.5, alpha: 0.35 });
+          linesGfx.stroke({ color: 0x00e5ff, width: 1.5, alpha: 0.25 });
 
           const mx = (self.x + otherAvatar.container.x) / 2;
           const my = (self.y + otherAvatar.container.y) / 2;
           linesGfx.circle(mx, my, 3);
-          linesGfx.fill({ color: 0x818cf8, alpha: 0.5 });
+          linesGfx.fill({ color: 0x00e5ff, alpha: 0.4 });
         }
       }
     }
@@ -365,16 +270,119 @@ export default function CosmosCanvas() {
     worldContainerRef.current.y = -cameraRef.current.y;
   }, [getOrCreateAvatar, removeAvatar]);
 
+  // ─── Initialize PixiJS ──────────────────────────────────────
+  useEffect(() => {
+    let destroyed = false;
+    let pixiApp = null;
+
+    const init = async () => {
+      const container = canvasRef.current;
+      if (!container || destroyed) return;
+
+      // Clear any stale children from previous mounts (React StrictMode)
+      while (container.firstChild) {
+        container.removeChild(container.firstChild);
+      }
+
+      const app = new Application();
+
+      try {
+        await app.init({
+          background: 0x0a0a1a,
+          resizeTo: window,
+          antialias: true,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+        });
+      } catch (err) {
+        console.error('[CosmosCanvas] Failed to init PixiJS:', err);
+        return;
+      }
+
+      if (destroyed) {
+        app.destroy(true);
+        return;
+      }
+
+      // Append canvas to DOM
+      container.appendChild(app.canvas);
+      appRef.current = app;
+      pixiApp = app;
+
+      // World container
+      const worldContainer = new Container();
+      app.stage.addChild(worldContainer);
+      worldContainerRef.current = worldContainer;
+
+      // Layers
+      createStarField(worldContainer);
+      createGrid(worldContainer);
+
+      // Connection lines layer
+      const linesGfx = new Graphics();
+      worldContainer.addChild(linesGfx);
+      connectionLinesRef.current = linesGfx;
+
+      // Proximity circle
+      const proximityGfx = new Graphics();
+      worldContainer.addChild(proximityGfx);
+      proximityCircleRef.current = proximityGfx;
+
+      // Start render loop
+      app.ticker.add(() => {
+        if (!destroyed) {
+          updateRender();
+        }
+      });
+    };
+
+    init();
+
+    const handleResize = () => {
+      if (appRef.current && appRef.current.renderer) {
+        appRef.current.renderer.resize(window.innerWidth, window.innerHeight);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      destroyed = true;
+      window.removeEventListener('resize', handleResize);
+
+      // Clean up avatar refs
+      avatarsRef.current = {};
+      selfAvatarRef.current = null;
+      starsRef.current = [];
+      floatingEmojisRef.current = [];
+      seenReactionsRef.current = new Set();
+      proximityCircleRef.current = null;
+      connectionLinesRef.current = null;
+      worldContainerRef.current = null;
+
+      // Destroy PixiJS app
+      const appToDestroy = pixiApp || appRef.current;
+      if (appToDestroy) {
+        try {
+          appToDestroy.destroy(true, { children: true });
+        } catch (e) {
+          // Ignore destroy errors during cleanup
+        }
+        appRef.current = null;
+        pixiApp = null;
+      }
+    };
+  }, [createStarField, createGrid, updateRender]);
+
   return (
     <div
       ref={canvasRef}
       id="cosmos-canvas"
       style={{
-        position: 'absolute',
+        position: 'fixed',
         top: 0,
         left: 0,
-        width: '100%',
-        height: '100%',
+        width: '100vw',
+        height: '100vh',
         zIndex: 0,
         touchAction: 'none',
         overflow: 'hidden',

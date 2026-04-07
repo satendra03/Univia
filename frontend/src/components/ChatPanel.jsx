@@ -1,7 +1,7 @@
 /**
  * ChatPanel — Unified proximity chat UI.
+ * Premium cosmic theme with cyan accents and glassmorphism.
  * Features: typing indicators, emoji quick-reactions, fully mobile-responsive.
- * On mobile: full-width, reduced height, compact layout.
  */
 import { useState, useRef, useEffect } from 'react';
 import { useGameStore } from '../store/useGameStore';
@@ -62,58 +62,141 @@ export default function ChatPanel() {
   };
 
   return (
-    <div className="fixed z-30 glass-panel animate-slide-in-up flex flex-col chat-panel"
-         style={{
-           /* Mobile: full width with margins. Desktop: fixed width */
-           bottom: 8,
-           right: 8,
-           left: 'auto',
-           width: 'min(380px, calc(100vw - 16px))',
-           height: 'min(440px, calc(100vh - 80px))',
-         }}>
-
+    <div
+      className="chat-panel animate-slide-in-up"
+      style={{
+        position: 'fixed',
+        zIndex: 30,
+        bottom: 8,
+        right: 8,
+        left: 'auto',
+        width: 'min(400px, calc(100vw - 16px))',
+        height: 'min(460px, calc(100vh - 80px))',
+        display: 'flex',
+        flexDirection: 'column',
+        background: 'rgba(10, 10, 20, 0.88)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        border: '1px solid rgba(0, 229, 255, 0.08)',
+        borderRadius: 18,
+        boxShadow: '0 8px 40px rgba(0, 0, 0, 0.5), 0 0 60px rgba(0, 229, 255, 0.03)',
+        overflow: 'hidden',
+      }}
+    >
       {/* ── Header ── */}
-      <div className="px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between shrink-0"
-           style={{ borderBottom: '1px solid var(--glass-border)' }}>
-        <div className="flex items-center gap-2">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-indigo)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <div
+        style={{
+          padding: '14px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexShrink: 0,
+          borderBottom: '1px solid rgba(0, 229, 255, 0.06)',
+          background: 'rgba(0, 229, 255, 0.02)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
-          <h3 className="text-xs sm:text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: '#e8e8f0', margin: 0 }}>
             Proximity Chat
           </h3>
           {hasNearby && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full"
-                  style={{ background: 'rgba(34,211,238,0.15)', color: 'var(--accent-cyan)' }}>
+            <span
+              style={{
+                fontSize: 10,
+                padding: '2px 8px',
+                borderRadius: 10,
+                background: 'rgba(0, 229, 255, 0.1)',
+                color: '#00e5ff',
+                fontWeight: 600,
+              }}
+            >
               {nearbyUsers.length}
             </span>
           )}
         </div>
         <button
           onClick={() => useGameStore.getState().setChatOpen(false)}
-          className="w-7 h-7 rounded flex items-center justify-center text-xs transition-colors cursor-pointer"
-          style={{ color: 'var(--text-muted)', background: 'rgba(129,140,248,0.05)' }}
-          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(129,140,248,0.15)'}
-          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(129,140,248,0.05)'}>
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 8,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 12,
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            color: '#6b7280',
+            background: 'rgba(255, 255, 255, 0.04)',
+            border: 'none',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+            e.currentTarget.style.color = '#fff';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)';
+            e.currentTarget.style.color = '#6b7280';
+          }}
+        >
           ✕
         </button>
       </div>
 
-      {/* ── Nearby Users Bar (scrollable on mobile) ── */}
+      {/* ── Nearby Users Bar ── */}
       {nearbyEntries.length > 0 && (
-        <div className="px-3 py-1.5 flex items-center gap-2 shrink-0 overflow-x-auto"
-             style={{ borderBottom: '1px solid rgba(129,140,248,0.05)' }}>
-          <span className="text-[10px] uppercase tracking-wider shrink-0"
-                style={{ color: 'var(--text-muted)' }}>
+        <div
+          style={{
+            padding: '8px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            flexShrink: 0,
+            overflowX: 'auto',
+            borderBottom: '1px solid rgba(0, 229, 255, 0.04)',
+          }}
+        >
+          <span
+            style={{
+              fontSize: 10,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              flexShrink: 0,
+              color: '#4b5563',
+              fontWeight: 600,
+            }}
+          >
             With:
           </span>
-          <div className="flex items-center gap-1.5">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             {nearbyEntries.map(([userId, { username, color }]) => (
-              <div key={userId} className="flex items-center gap-1 px-2 py-0.5 rounded-full shrink-0"
-                   style={{ background: 'rgba(129,140,248,0.06)' }}>
-                <div className="w-3 h-3 rounded-full shrink-0"
-                     style={{ background: color }} />
-                <span className="text-[11px] font-medium" style={{ color: 'var(--text-primary)' }}>
+              <div
+                key={userId}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  padding: '3px 10px',
+                  borderRadius: 20,
+                  flexShrink: 0,
+                  background: 'rgba(0, 229, 255, 0.05)',
+                  border: '1px solid rgba(0, 229, 255, 0.06)',
+                }}
+              >
+                <div
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: '50%',
+                    flexShrink: 0,
+                    background: color,
+                    boxShadow: `0 0 6px ${color}44`,
+                  }}
+                />
+                <span style={{ fontSize: 11, fontWeight: 500, color: '#e8e8f0' }}>
                   {username}
                 </span>
               </div>
@@ -123,13 +206,23 @@ export default function ChatPanel() {
       )}
 
       {/* ── Messages ── */}
-      <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-2 sm:py-3 space-y-2" style={{ minHeight: 0 }}>
+      <div
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: '12px 14px',
+          minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+        }}
+      >
         {messages.length === 0 && (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <p className="text-xl sm:text-2xl mb-2">💬</p>
-              <p className="text-[11px] sm:text-xs" style={{ color: 'var(--text-muted)' }}>
-                {hasNearby ? "You're connected! Say hello 👋" : "Move near other players to chat"}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ fontSize: 28, marginBottom: 8 }}>💬</p>
+              <p style={{ fontSize: 12, color: '#6b7280' }}>
+                {hasNearby ? "You're connected! Say hello 👋" : 'Move near other players to chat'}
               </p>
             </div>
           </div>
@@ -138,9 +231,17 @@ export default function ChatPanel() {
         {messages.map((msg, i) => {
           if (msg.isSystem) {
             return (
-              <div key={i} className="flex justify-center py-1">
-                <span className="text-[10px] sm:text-[11px] px-3 py-1 rounded-full"
-                      style={{ background: 'rgba(129,140,248,0.06)', color: 'var(--text-muted)' }}>
+              <div key={i} style={{ display: 'flex', justifyContent: 'center', padding: '4px 0' }}>
+                <span
+                  style={{
+                    fontSize: 10,
+                    padding: '4px 14px',
+                    borderRadius: 20,
+                    background: 'rgba(0, 229, 255, 0.04)',
+                    color: '#6b7280',
+                    border: '1px solid rgba(0, 229, 255, 0.04)',
+                  }}
+                >
                   {msg.content}
                 </span>
               </div>
@@ -149,29 +250,41 @@ export default function ChatPanel() {
 
           const isSelf = msg.sender === self?.username;
           return (
-            <div key={i} className={`flex ${isSelf ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[80%] flex flex-col ${isSelf ? 'items-end' : 'items-start'}`}>
+            <div key={i} style={{ display: 'flex', justifyContent: isSelf ? 'flex-end' : 'flex-start' }}>
+              <div
+                style={{
+                  maxWidth: '80%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: isSelf ? 'flex-end' : 'flex-start',
+                }}
+              >
                 {!isSelf && (
-                  <p className="text-[10px] sm:text-xs mb-0.5 font-medium px-1"
-                     style={{ color: msg.senderColor || 'var(--text-muted)' }}>
+                  <p style={{ fontSize: 10, marginBottom: 3, fontWeight: 600, paddingLeft: 4, color: msg.senderColor || '#6b7280' }}>
                     {msg.sender}
                   </p>
                 )}
-                <div className="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm"
-                     style={{
-                       background: isSelf
-                         ? 'linear-gradient(135deg, rgba(129,140,248,0.25), rgba(167,139,250,0.2))'
-                         : 'rgba(255,255,255,0.05)',
-                       color: 'var(--text-primary)',
-                       borderBottomRightRadius: isSelf ? '4px' : '12px',
-                       borderBottomLeftRadius: isSelf ? '12px' : '4px',
-                       wordBreak: 'break-word',
-                       overflowWrap: 'anywhere',
-                       whiteSpace: 'pre-wrap',
-                     }}>
+                <div
+                  style={{
+                    padding: '8px 14px',
+                    borderRadius: 14,
+                    fontSize: 13,
+                    lineHeight: 1.5,
+                    background: isSelf
+                      ? 'linear-gradient(135deg, rgba(0, 229, 255, 0.18), rgba(0, 184, 212, 0.12))'
+                      : 'rgba(255, 255, 255, 0.04)',
+                    color: '#e8e8f0',
+                    borderBottomRightRadius: isSelf ? 4 : 14,
+                    borderBottomLeftRadius: isSelf ? 14 : 4,
+                    wordBreak: 'break-word',
+                    overflowWrap: 'anywhere',
+                    whiteSpace: 'pre-wrap',
+                    border: isSelf ? '1px solid rgba(0, 229, 255, 0.08)' : '1px solid rgba(255, 255, 255, 0.03)',
+                  }}
+                >
                   {msg.content}
                 </div>
-                <p className="text-[9px] sm:text-[10px] mt-0.5 px-1" style={{ color: 'var(--text-muted)' }}>
+                <p style={{ fontSize: 9, marginTop: 3, paddingLeft: 4, paddingRight: 4, color: '#4b5563' }}>
                   {msg.timestamp
                     ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                     : ''}
@@ -185,12 +298,12 @@ export default function ChatPanel() {
 
       {/* ── Typing Indicator ── */}
       {typingList.length > 0 && (
-        <div className="px-3 py-1 shrink-0">
-          <div className="flex items-center gap-2">
+        <div style={{ padding: '4px 14px 2px', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div className="typing-dots">
               <span /><span /><span />
             </div>
-            <span className="text-[10px] sm:text-[11px]" style={{ color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: 11, color: '#6b7280' }}>
               {typingList.length === 1
                 ? `${typingList[0].username} is typing...`
                 : `${typingList.length} people typing...`}
@@ -201,22 +314,42 @@ export default function ChatPanel() {
 
       {/* ── Reaction Picker ── */}
       {showReactions && (
-        <div className="px-3 py-2 flex gap-1 sm:gap-1.5 shrink-0 animate-fade-in"
-             style={{ borderTop: '1px solid rgba(129,140,248,0.08)' }}>
+        <div
+          className="animate-fade-in"
+          style={{
+            padding: '8px 14px',
+            display: 'flex',
+            gap: 6,
+            flexShrink: 0,
+            borderTop: '1px solid rgba(0, 229, 255, 0.06)',
+          }}
+        >
           {REACTION_EMOJIS.map((emoji) => (
             <button
               key={emoji}
               onClick={() => handleReaction(emoji)}
-              className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-base sm:text-lg cursor-pointer transition-all"
-              style={{ background: 'rgba(129,140,248,0.06)' }}
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 10,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 18,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                background: 'rgba(0, 229, 255, 0.04)',
+                border: '1px solid rgba(0, 229, 255, 0.06)',
+              }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(129,140,248,0.2)';
+                e.currentTarget.style.background = 'rgba(0, 229, 255, 0.12)';
                 e.currentTarget.style.transform = 'scale(1.2)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(129,140,248,0.06)';
+                e.currentTarget.style.background = 'rgba(0, 229, 255, 0.04)';
                 e.currentTarget.style.transform = 'scale(1)';
-              }}>
+              }}
+            >
               {emoji}
             </button>
           ))}
@@ -224,17 +357,36 @@ export default function ChatPanel() {
       )}
 
       {/* ── Input ── */}
-      <form onSubmit={handleSend} className="px-2 sm:px-3 py-2 sm:py-3 flex gap-1.5 sm:gap-2 shrink-0"
-            style={{ borderTop: '1px solid var(--glass-border)' }}>
+      <form
+        onSubmit={handleSend}
+        style={{
+          padding: '10px 12px',
+          display: 'flex',
+          gap: 8,
+          flexShrink: 0,
+          borderTop: '1px solid rgba(0, 229, 255, 0.06)',
+          alignItems: 'center',
+        }}
+      >
         {/* Reaction toggle */}
         <button
           type="button"
           onClick={() => setShowReactions(!showReactions)}
-          className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center cursor-pointer transition-all"
           style={{
-            background: showReactions ? 'rgba(129,140,248,0.2)' : 'rgba(129,140,248,0.06)',
-            fontSize: '16px',
-          }}>
+            flexShrink: 0,
+            width: 38,
+            height: 38,
+            borderRadius: 10,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            fontSize: 18,
+            background: showReactions ? 'rgba(0, 229, 255, 0.12)' : 'rgba(255, 255, 255, 0.03)',
+            border: showReactions ? '1px solid rgba(0, 229, 255, 0.15)' : '1px solid rgba(255, 255, 255, 0.04)',
+          }}
+        >
           😊
         </button>
 
@@ -246,13 +398,52 @@ export default function ChatPanel() {
           placeholder={hasNearby ? 'Type a message...' : 'No one nearby...'}
           maxLength={100}
           disabled={!hasNearby}
-          className="input-cosmos flex-1"
-          style={{ padding: '8px 12px', fontSize: '16px', opacity: hasNearby ? 1 : 0.5, minWidth: 0 }}
+          style={{
+            flex: 1,
+            minWidth: 0,
+            padding: '9px 14px',
+            fontSize: 14,
+            fontFamily: 'var(--font-sans)',
+            background: 'rgba(255, 255, 255, 0.04)',
+            border: '1px solid rgba(0, 229, 255, 0.06)',
+            borderRadius: 10,
+            color: '#e8e8f0',
+            outline: 'none',
+            transition: 'all 0.15s ease',
+            opacity: hasNearby ? 1 : 0.4,
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = 'rgba(0, 229, 255, 0.2)';
+            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 229, 255, 0.06)';
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = 'rgba(0, 229, 255, 0.06)';
+            e.currentTarget.style.boxShadow = 'none';
+          }}
         />
-        <button type="submit" className="btn-primary shrink-0"
-                style={{ padding: '8px 14px', fontSize: '13px' }}
-                disabled={!inputValue.trim() || !hasNearby}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+
+        <button
+          type="submit"
+          disabled={!inputValue.trim() || !hasNearby}
+          style={{
+            flexShrink: 0,
+            width: 38,
+            height: 38,
+            borderRadius: 10,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: !inputValue.trim() || !hasNearby ? 'not-allowed' : 'pointer',
+            transition: 'all 0.15s ease',
+            background: inputValue.trim() && hasNearby
+              ? 'linear-gradient(135deg, #00e5ff, #00b8d4)'
+              : 'rgba(255, 255, 255, 0.04)',
+            border: 'none',
+            opacity: !inputValue.trim() || !hasNearby ? 0.4 : 1,
+            boxShadow: inputValue.trim() && hasNearby ? '0 2px 12px rgba(0, 229, 255, 0.25)' : 'none',
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={inputValue.trim() && hasNearby ? '#0a0a1a' : '#6b7280'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="22" y1="2" x2="11" y2="13" />
             <polygon points="22 2 15 22 11 13 2 9 22 2" />
           </svg>

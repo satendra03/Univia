@@ -2,8 +2,8 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════
-   Virtual Cosmos — Design System
-   A cosmic-themed dark UI with vibrant accents and glassmorphism.
+   Univia — Design System
+   A cosmic-themed dark UI with cyan accents and glassmorphism.
    ═══════════════════════════════════════════════════════════════ */
 
 
@@ -11,10 +11,10 @@
 :root {
   /* Core palette */
   --cosmos-bg: #0a0a1a;
-  --cosmos-surface: #111128;
-  --cosmos-surface-2: #1a1a3e;
-  --cosmos-border: rgba(99, 102, 241, 0.15);
-  --cosmos-border-glow: rgba(99, 102, 241, 0.4);
+  --cosmos-surface: #111116;
+  --cosmos-surface-2: #1a1a2e;
+  --cosmos-border: rgba(0, 229, 255, 0.08);
+  --cosmos-border-glow: rgba(0, 229, 255, 0.25);
 
   /* Text hierarchy */
   --text-primary: #e8e8f0;
@@ -22,21 +22,22 @@
   --text-muted: #6b7280;
 
   /* Accent colors */
+  --accent-cyan: #00e5ff;
+  --accent-cyan-dim: #00b8d4;
   --accent-indigo: #818cf8;
   --accent-violet: #a78bfa;
-  --accent-cyan: #22d3ee;
   --accent-emerald: #34d399;
   --accent-rose: #fb7185;
   --accent-amber: #fbbf24;
 
   /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #818cf8 0%, #a78bfa 50%, #c084fc 100%);
-  --gradient-cosmic: linear-gradient(135deg, #0a0a1a 0%, #1a1040 50%, #0d1117 100%);
-  --gradient-glow: radial-gradient(circle at 50% 50%, rgba(129, 140, 248, 0.15) 0%, transparent 70%);
+  --gradient-primary: linear-gradient(135deg, #00e5ff 0%, #00b8d4 100%);
+  --gradient-cosmic: linear-gradient(135deg, #0a0a1a 0%, #0d1a2a 50%, #0d1117 100%);
+  --gradient-glow: radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.1) 0%, transparent 70%);
 
   /* Glass effect */
-  --glass-bg: rgba(17, 17, 40, 0.75);
-  --glass-border: rgba(129, 140, 248, 0.12);
+  --glass-bg: rgba(10, 10, 20, 0.85);
+  --glass-border: rgba(0, 229, 255, 0.08);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 
   /* Typography */
@@ -66,8 +67,7 @@
 
 html, body {
   width: 100%;
-  height: 100%;
-  overflow: hidden;
+  min-height: 100%;
   background: var(--cosmos-bg);
   color: var(--text-primary);
   font-family: var(--font-sans);
@@ -75,25 +75,37 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Lock scrolling when the game canvas is active */
+html:has(body.game-active),
+body.game-active {
+  height: 100%;
+  overflow: hidden;
+}
+
+body.game-active #root {
+  height: 100%;
+  overflow: hidden;
+}
+
 #root {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   position: relative;
 }
 
 /* ─── Scrollbar Styles ───────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(129, 140, 248, 0.3);
+  background: rgba(0, 229, 255, 0.15);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(129, 140, 248, 0.5);
+  background: rgba(0, 229, 255, 0.3);
 }
 
 /* ─── Glass Panel ────────────────────────────────────────────── */
@@ -109,6 +121,7 @@ html, body {
 .glass-panel-sm {
   background: var(--glass-bg);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
 }
@@ -125,6 +138,7 @@ html, body {
   padding: 1px;
   background: var(--gradient-primary);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0.5;
@@ -134,7 +148,7 @@ html, body {
   opacity: 1;
 }
 
-/* ─── Pulse Animation ────────────────────────────────────────── */
+/* ─── Animations ─────────────────────────────────────────────── */
 @keyframes pulse-glow {
   0%, 100% { opacity: 0.4; transform: scale(1); }
   50% { opacity: 0.8; transform: scale(1.05); }
@@ -192,17 +206,17 @@ html, body {
   border: none;
   border-radius: var(--radius-md);
   background: var(--gradient-primary);
-  color: white;
+  color: #0a0a1a;
   font-family: var(--font-sans);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 15px;
   cursor: pointer;
   transition: all var(--transition-smooth);
-  box-shadow: 0 4px 20px rgba(129, 140, 248, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 229, 255, 0.25);
 }
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(129, 140, 248, 0.5);
+  box-shadow: 0 8px 30px rgba(0, 229, 255, 0.4);
 }
 .btn-primary:active {
   transform: translateY(0);
@@ -212,7 +226,7 @@ html, body {
 .input-cosmos {
   width: 100%;
   padding: 14px 18px;
-  background: rgba(17, 17, 40, 0.6);
+  background: rgba(10, 10, 20, 0.6);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   color: var(--text-primary);
@@ -225,8 +239,8 @@ html, body {
   color: var(--text-muted);
 }
 .input-cosmos:focus {
-  border-color: var(--accent-indigo);
-  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
+  border-color: rgba(0, 229, 255, 0.3);
+  box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.08);
 }
 
 /* ─── Status Indicator ───────────────────────────────────────── */
@@ -242,7 +256,7 @@ html, body {
 }
 .status-dot.nearby {
   background: var(--accent-cyan);
-  box-shadow: 0 0 8px rgba(34, 211, 238, 0.5);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
 }
 
 /* ─── Typing Indicator Dots ─────────────────────────────────── */
@@ -255,7 +269,7 @@ html, body {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: var(--accent-indigo);
+  background: var(--accent-cyan);
   animation: typingBounce 1.2s ease-in-out infinite;
 }
 .typing-dots span:nth-child(2) {
@@ -279,7 +293,7 @@ html, body {
 
 /* ─── Mobile Joystick & Touch ───────────────────────────────── */
 @media (hover: none) and (pointer: coarse) {
-  .glass-panel-sm.controls-reminder {
+  .controls-reminder {
     display: none !important;
   }
 }
@@ -287,7 +301,7 @@ html, body {
 /* ─── Mobile Responsive ─────────────────────────────────────── */
 @media (max-width: 639px) {
   /* Hide WASD hints on small screens regardless of touch */
-  .glass-panel-sm.controls-reminder {
+  .controls-reminder {
     display: none !important;
   }
 
