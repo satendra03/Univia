@@ -13,6 +13,12 @@ export const useGameStore = create((set, get) => ({
   setLoggedIn: (isLoggedIn) => set({ isLoggedIn }),
   setLoginError: (loginError) => set({ loginError }),
 
+  // ─── Server Status ──────────────────────────────────────────
+  serverActive: false,
+  checkingHealth: true,
+  setServerActive: (serverActive) => set({ serverActive }),
+  setCheckingHealth: (checkingHealth) => set({ checkingHealth }),
+
   // ─── Profile (status/bio) ──────────────────────────────────
   userStatus: '',
   userBio: '',

@@ -111,8 +111,10 @@ export default function App() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const [serverActive, setServerActive] = useState(false);
-  const [checkingHealth, setCheckingHealth] = useState(true);
+  const serverActive = useGameStore((s) => s.serverActive);
+  const checkingHealth = useGameStore((s) => s.checkingHealth);
+  const setServerActive = useGameStore((s) => s.setServerActive);
+  const setCheckingHealth = useGameStore((s) => s.setCheckingHealth);
 
   // Global server health check
   useEffect(() => {
@@ -121,7 +123,10 @@ export default function App() {
       try {
         const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3000';
         const res = await fetch(`${SERVER_URL}/health`);
-        if (active) setServerActive(res.ok);
+        console.log("This is res", res);
+        if (active) {
+          setServerActive(res.ok);
+        }
       } catch (e) {
         if (active) setServerActive(false);
       } finally {
@@ -134,14 +139,14 @@ export default function App() {
       active = false;
       clearInterval(interval);
     };
-  }, []);
+  }, [setServerActive, setCheckingHealth]);
 
   // Redirect to /game when logged in (only if server active)
   useEffect(() => {
-    if (isLoggedIn && pathname !== '/game') {
+    if (!checkingHealth && isLoggedIn && serverActive && pathname !== '/game') {
       navigate('/game', { replace: true });
     }
-  }, [isLoggedIn, pathname, navigate]);
+  }, [checkingHealth, isLoggedIn, serverActive, pathname, navigate]);
 
   // Block protected routes if server is offline
   useEffect(() => {

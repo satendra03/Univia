@@ -89,39 +89,17 @@ const STATS = [
 /* ================================================================
  * ─── Main Component ─────────────────────────────────────────────
  * ================================================================ */
-export default function LandingPage({ onEnter }) {
+export default function LandingPage({ onEnter, appServerActive, appCheckingHealth }) {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
-  const [serverActive, setServerActive] = useState(false);
-  const [checkingHealth, setCheckingHealth] = useState(true);
+  
+  const serverActive = appServerActive;
+  const checkingHealth = appCheckingHealth;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  useEffect(() => {
-    let active = true;
-    const checkServerHealth = async () => {
-      try {
-        const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3000';
-        const res = await fetch(`${SERVER_URL}/health`);
-        if (active) {
-          setServerActive(res.ok);
-        }
-      } catch (e) {
-        if (active) setServerActive(false);
-      } finally {
-        if (active) setCheckingHealth(false);
-      }
-    };
-    checkServerHealth();
-    const interval = setInterval(checkServerHealth, 10000);
-    return () => {
-      active = false;
-      clearInterval(interval);
-    };
   }, []);
 
   return (
