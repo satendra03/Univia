@@ -1,8 +1,7 @@
 /**
- * UserService — Manages in-memory user state and MongoDB persistence.
+ * UserService — Manages in-memory user state.
  * SRP: Only handles user CRUD & state—not proximity or chat.
  */
-import User from '../models/User.js';
 import { randomColor, randomSpawnPosition } from '../utils/helpers.js';
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../config/constants.js';
 
@@ -14,7 +13,7 @@ class UserService {
     this.usernameToSocket = new Map();
   }
 
-  async addUser(socketId, username) {
+  addUser(socketId, username) {
     // Handle duplicate tabs: transfer session
     const existingSocketId = this.usernameToSocket.get(username);
     if (existingSocketId && this.users.has(existingSocketId)) {
@@ -26,22 +25,8 @@ class UserService {
       return existingUser;
     }
 
-    let color = randomColor();
-    let position = randomSpawnPosition(WORLD_WIDTH, WORLD_HEIGHT);
-
-    try {
-      const dbUser = await User.findOne({ username });
-      if (dbUser) {
-        color = dbUser.color;
-        position = dbUser.lastPosition || position;
-        dbUser.isOnline = true;
-        await dbUser.save();
-      } else {
-        await User.create({ username, color, lastPosition: position, isOnline: true });
-      }
-    } catch (err) {
-      console.warn('[UserService] DB unavailable, using in-memory:', err.message);
-    }
+    const color = randomColor();
+    const position = randomSpawnPosition(WORLD_WIDTH, WORLD_HEIGHT);
 
     const user = { id: socketId, username, x: position.x, y: position.y, color };
     this.users.set(socketId, user);
@@ -57,18 +42,9 @@ class UserService {
     return user;
   }
 
-  async removeUser(socketId) {
+  removeUser(socketId) {
     const user = this.users.get(socketId);
     if (!user) return null;
-
-    try {
-      await User.findOneAndUpdate(
-        { username: user.username },
-        { lastPosition: { x: user.x, y: user.y }, isOnline: false }
-      );
-    } catch (err) {
-      console.warn('[UserService] Failed to persist disconnect:', err.message);
-    }
 
     this.users.delete(socketId);
     this.usernameToSocket.delete(user.username);

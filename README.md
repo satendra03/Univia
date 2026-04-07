@@ -1,135 +1,47 @@
-# 🌌 Cosmos
+# Univia
 
-A real-time 2D multiplayer environment where users move and interact based on proximity. Built with production-grade architecture, clean separation of concerns, and scalable design patterns.
+A real-time 2D multiplayer proximity social platform where users connect through spatial closeness — not profiles. Move your avatar, walk near others, and conversations begin automatically. Built with production-grade architecture, clean separation of concerns, and scalable design patterns.
 
-![Tech Stack](https://img.shields.io/badge/React-19-61DAFB?logo=react)
-![Tech Stack](https://img.shields.io/badge/PixiJS-8-E91E63?logo=pixi)
-![Tech Stack](https://img.shields.io/badge/Socket.IO-4-010101?logo=socketdotio)
-![Tech Stack](https://img.shields.io/badge/MongoDB-8-47A248?logo=mongodb)
-![Tech Stack](https://img.shields.io/badge/Tailwind-4-06B6D4?logo=tailwindcss)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
+![PixiJS](https://img.shields.io/badge/PixiJS-8-E91E63?logo=pixi)
+![Socket.IO](https://img.shields.io/badge/Socket.IO-4-010101?logo=socketdotio)
+![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite)
+![React Router](https://img.shields.io/badge/React_Router-7-CA4245?logo=reactrouter)
+![Lucide](https://img.shields.io/badge/Lucide_React-Icons-F56565)
 
 ---
 
-## ✨ Features
+## Features
 
-- **2D Space Navigation** — Move your avatar using WASD or Arrow keys in a vast cosmic world
-- **Real-Time Multiplayer** — See all connected users moving in real time via WebSocket
+- **2D Space Navigation** — Move your avatar using WASD or Arrow keys in a vast 3000×2000 cosmic world
+- **Real-Time Multiplayer** — See all connected users moving in real time via WebSocket with sub-50ms latency
 - **Proximity Detection** — Automatic connection when users are within 150px radius
-- **Proximity Chat** — Auto-join/leave chat rooms based on spatial distance
-- **Smooth Camera** — Camera follows your avatar with smooth interpolation
-- **MiniMap** — Bird's-eye view of the entire world with player positions
-- **Glass UI** — Premium glassmorphism design with cosmic dark theme
+- **Spatial Chat** — Group-based proximity chat with typing indicators and persistent session history
+- **Emoji Reactions** — Floating emoji animations visible to all nearby players
+- **Live Mini-Map** — Bird's-eye view of the entire world with real-time player positions
+- **Dynamic Avatars** — Unique HSL-generated colors, pulsing glow effects, and smooth position interpolation
+- **Connection Lines** — Animated cyan lines connecting nearby avatars with midpoint indicators
+- **Premium UI** — Dark sci-fi aesthetic with glassmorphism, Lucide icons, and micro-animations
+- **Multi-Page App** — Landing, Features, About, Docs, Privacy, and Terms pages via React Router
 
 ---
 
-## 🏗️ Architecture
+## Pages & Routes
 
-### System Overview
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                      Client (React)                      │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌─────────┐ │
-│  │  Canvas   │  │   UI     │  │  Hooks   │  │  Store  │ │
-│  │ (PixiJS)  │  │Components│  │          │  │(Zustand)│ │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬────┘ │
-│       └──────────────┴─────────────┴─────────────┘      │
-│                          │                               │
-│                 ┌────────┴────────┐                      │
-│                 │  Socket Service  │                      │
-│                 └────────┬────────┘                      │
-└──────────────────────────┼──────────────────────────────┘
-                           │ WebSocket
-┌──────────────────────────┼──────────────────────────────┐
-│                      Server (Node.js)                    │
-│                 ┌────────┴────────┐                      │
-│                 │ Socket Handlers  │                      │
-│                 └────────┬────────┘                      │
-│       ┌──────────────────┼──────────────────┐           │
-│  ┌────┴─────┐  ┌────────┴──────┐  ┌────────┴────┐      │
-│  │  User    │  │  Proximity    │  │    Chat     │      │
-│  │ Service  │  │   Service     │  │   Service   │      │
-│  └────┬─────┘  └────────┬──────┘  └────────┬────┘      │
-│       │        ┌────────┴──────┐           │           │
-│       │        │ Spatial Grid  │           │           │
-│       │        └───────────────┘           │           │
-│  ┌────┴────────────────────────────────────┴────┐      │
-│  │                 MongoDB                       │      │
-│  └───────────────────────────────────────────────┘      │
-└─────────────────────────────────────────────────────────┘
-```
-
-### Design Principles
-
-| Principle | Implementation |
-|-----------|---------------|
-| **SRP** | Each service handles one domain (User, Proximity, Chat) |
-| **OCP** | Socket handlers are composable — add new ones without modifying existing |
-| **DIP** | Components depend on abstractions (stores, services), not implementations |
-| **Separation of Concerns** | Canvas rendering, state, networking, and UI are fully decoupled |
-
-### Frontend Architecture
-
-```
-frontend/src/
-├── canvas/          # PixiJS rendering layer (isolated from React)
-│   └── CosmosCanvas.jsx
-├── components/      # React UI components (overlaid on canvas)
-│   ├── ChatPanel.jsx
-│   ├── HUD.jsx
-│   ├── LoginScreen.jsx
-│   ├── MiniMap.jsx
-│   └── UserList.jsx
-├── hooks/           # Custom React hooks (business logic)
-│   ├── useChat.js
-│   ├── useMovement.js
-│   └── useSocket.js
-├── services/        # Network communication layer
-│   └── socketService.js
-├── store/           # Zustand state management
-│   ├── useChatStore.js
-│   └── useGameStore.js
-├── utils/           # Pure helper functions
-│   ├── colors.js
-│   └── constants.js
-├── App.jsx
-├── main.jsx
-└── index.css        # Design system tokens
-```
-
-### Backend Architecture
-
-```
-backend/src/
-├── config/          # Configuration modules
-│   ├── constants.js # Centralized constants
-│   ├── db.js        # MongoDB connection
-│   └── socket.js    # Socket.IO server factory
-├── controllers/     # REST API controllers (thin layer)
-│   └── userController.js
-├── models/          # MongoDB schemas
-│   ├── Message.js
-│   └── User.js
-├── routes/          # Express routes
-│   └── userRoutes.js
-├── services/        # Business logic (core domain)
-│   ├── ChatService.js
-│   ├── ProximityService.js
-│   └── UserService.js
-├── sockets/         # Socket event handlers (transport layer)
-│   ├── chatHandler.js
-│   ├── connectionHandler.js
-│   ├── movementHandler.js
-│   └── index.js
-├── utils/           # Data structures & helpers
-│   ├── SpatialGrid.js
-│   └── helpers.js
-└── app.js           # Express app setup
-```
+| Route | Component | Description |
+|-------|-----------|-------------|
+| `/` | `LandingPage` | Animated star field, features grid, how-it-works steps, CTA |
+| `/login` | `LoginScreen` | Username entry with cosmic theme |
+| `/game` | `GameWorld` | PixiJS canvas + HUD + Chat + MiniMap |
+| `/features` | `FeaturesPage` | Detailed feature cards with bento grid layout |
+| `/about` | `AboutPage` | Mission, values, development timeline, tech stack |
+| `/docs` | `DocsPage` | Getting started guide, controls, chat docs, architecture |
+| `/privacy` | `PrivacyPage` | Privacy policy |
+| `/terms` | `TermsPage` | Terms of service |
 
 ---
 
-## 📐 Proximity Algorithm
+## Proximity Algorithm
 
 ### Spatial Grid Partitioning
 
@@ -164,7 +76,7 @@ Instead of O(n²) brute-force distance checks, we use **grid-based spatial parti
 
 ---
 
-## 🔄 Real-Time Design
+## Real-Time Design
 
 ### Socket Event Flow
 
@@ -185,21 +97,12 @@ Client A                Server                 Client B
    │◄─ chat:message ──────┤── chat:message ──────►│
 ```
 
-### Throttling Strategy
 
-| Layer | Mechanism | Interval |
-|-------|-----------|----------|
-| Client | `requestAnimationFrame` + timestamp check | 50ms |
-| Server | Timestamp diff per socket | 50ms |
-
----
-
-## 🚀 Setup
+## Setup
 
 ### Prerequisites
 
 - Node.js 18+
-- MongoDB (optional — works without it)
 
 ### 1. Clone & Install
 
@@ -216,9 +119,8 @@ npm install
 ### 2. Configure Environment
 
 ```bash
-# backend/.env (already created with defaults)
+# backend/.env
 PORT=3001
-MONGODB_URI=mongodb://localhost:27017/virtual-cosmos
 CLIENT_URL=http://localhost:5173
 PROXIMITY_RADIUS=150
 WORLD_WIDTH=3000
@@ -243,49 +145,24 @@ Open `http://localhost:5173` in **multiple browser tabs**, enter different usern
 
 ---
 
-## 🧪 Edge Cases Handled
 
-| Edge Case | Solution |
-|-----------|----------|
-| Sudden disconnect | Server cleans up user state, spatial grid, and chat rooms |
-| Rapid in/out of radius | Diff-based detection prevents duplicate events |
-| Multiple simultaneous connections | Each user has independent proximity tracking |
-| Same username, different tab | Session transfer to new socket ID |
-| DB unavailable | Graceful fallback to in-memory operation |
-| Invalid input | Server-side validation on all socket events |
-
----
-
-## 📈 Scaling Ideas
-
-### Short-term
-- **Redis adapter for Socket.IO** — Scale horizontally across multiple server instances
-- **Worker threads** — Move proximity calculations off the main event loop
-- **Message queue** — Decouple chat persistence from real-time delivery
-
-### Long-term
-- **QuadTree** — Replace grid with adaptive spatial partitioning for non-uniform distribution
-- **Interest management** — Only send position updates for players within a broader radius
-- **Area-of-Interest (AOI) zones** — Pre-defined regions with dedicated server processes
-- **WebRTC for P2P** — Direct player-to-player audio/video when in proximity
-
----
-
-## 📦 Tech Stack
+## Tech Stack
 
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
-| Frontend Framework | React 19 | UI components |
-| Canvas Rendering | PixiJS 8 | 2D world rendering |
-| Styling | Tailwind CSS 4 | Utility-first CSS |
+| Frontend Framework | React 19 | UI components & routing |
+| Canvas Rendering | PixiJS 8 | Hardware-accelerated 2D world rendering |
+| Routing | React Router 7 | Client-side page navigation |
+| Icons | Lucide React | Consistent SVG line icons |
 | State Management | Zustand 5 | Lightweight stores |
 | WebSocket Client | Socket.IO Client 4 | Real-time communication |
+| Build Tool | Vite 6 | Next-gen frontend bundler |
 | Backend Framework | Express 5 | REST API |
 | WebSocket Server | Socket.IO 4 | Real-time server |
-| Database | MongoDB + Mongoose 8 | User & message persistence |
 
 ---
 
-## 📄 License
+## License
 
-MIT
+This project is licensed under the [MIT License](LICENSE).
+

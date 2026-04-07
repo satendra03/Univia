@@ -29,7 +29,7 @@ export default function connectionHandler(io, socket) {
         return;
       }
 
-      const user = await userService.addUser(socket.id, sanitizedName);
+      const user = userService.addUser(socket.id, sanitizedName);
 
       proximityService.updatePosition(socket.id, user.x, user.y);
 
@@ -86,7 +86,7 @@ export default function connectionHandler(io, socket) {
         }
       }
 
-      await userService.removeUser(socket.id);
+      userService.removeUser(socket.id);
 
       io.emit(EVENTS.PLAYER_LEFT, { playerId: socket.id, username: user.username });
 
